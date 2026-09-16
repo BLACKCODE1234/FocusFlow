@@ -1,11 +1,7 @@
 fastapi
-uvicorn
+uvicorn[standard]
 python-dotenv
-google-api-python-client
-google-auth-httplib2
-google-auth-oauthlib
 pyotp
 python-jose[cryptography]
 passlib[argon2]
-EmailMessage
 pydantic
