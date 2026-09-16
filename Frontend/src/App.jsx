@@ -1,20 +1,22 @@
+import { lazy, Suspense } from 'react'
 import { Route, Routes } from 'react-router-dom'
+
+const Landing = lazy(() => import('./pages/Landing/Landing.jsx'))
+
+function PageLoader() {
+  return (
+    <div className="grid min-h-screen place-items-center bg-slate-950">
+      <span className="h-10 w-10 animate-spin rounded-full border-2 border-slate-700 border-t-fuchsia-500" />
+    </div>
+  )
+}
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <Suspense fallback={<PageLoader />}>
       <Routes>
-        <Route
-          path="/"
-          element={
-            <main className="flex min-h-screen items-center justify-center">
-              <h1 className="text-4xl font-bold text-indigo-600">
-                FocusFlow AI
-              </h1>
-            </main>
-          }
-        />
+        <Route path="/" element={<Landing />} />
       </Routes>
-    </div>
+    </Suspense>
   )
 }
