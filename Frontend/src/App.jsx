@@ -2,6 +2,9 @@ import { lazy, Suspense } from 'react'
 import { Route, Routes } from 'react-router-dom'
 
 const Landing = lazy(() => import('./pages/Landing/Landing.jsx'))
+const Login = lazy(() => import('./pages/Auth/Login.jsx'))
+const Register = lazy(() => import('./pages/Auth/Register.jsx'))
+const VerifyOtp = lazy(() => import('./pages/Auth/VerifyOtp.jsx'))
 
 function PageLoader() {
   return (
@@ -16,6 +19,10 @@ export default function App() {
     <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/verify-email" element={<VerifyOtp />} />
+        <Route path="/verify-otp" element={<VerifyOtp />} />
       </Routes>
     </Suspense>
   )
