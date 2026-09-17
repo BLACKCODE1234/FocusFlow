@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom'
 
 const links = [
   { label: 'Features', href: '#features' },
   { label: 'AI Assistant', href: '#ai' },
-  { label: 'Who it\'s for', href: '#audience' },
+  { label: "Who it's for", href: '#audience' },
 ]
 
 export default function Navbar() {
@@ -19,24 +18,18 @@ export default function Navbar() {
   }, [])
 
   return (
-    <motion.header
-      initial={{ y: -80, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6, ease: 'easeOut' }}
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? 'border-b border-white/10 bg-slate-950/80 backdrop-blur-xl'
-          : 'bg-transparent'
+    <header
+      className={`fixed inset-x-0 top-0 z-50 border-b transition-colors duration-300 ${
+        scrolled ? 'border-white/10 bg-slate-950/90 backdrop-blur' : 'border-transparent bg-transparent'
       }`}
     >
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link to="/" className="flex items-center gap-2.5">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 text-lg font-black text-white shadow-lg shadow-violet-500/30">
+          <span className="grid h-9 w-9 place-items-center rounded-lg bg-violet-600 text-lg font-black text-white">
             F
           </span>
           <span className="text-lg font-bold tracking-tight text-white">
-            FocusFlow
-            <span className="gradient-text font-extrabold"> AI</span>
+            FocusFlow <span className="text-violet-400 font-extrabold">AI</span>
           </span>
         </Link>
 
@@ -45,7 +38,7 @@ export default function Navbar() {
             <a
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-slate-300 transition-colors hover:text-white"
+              className="text-sm font-medium text-slate-300 hover:text-white"
             >
               {link.label}
             </a>
@@ -55,13 +48,13 @@ export default function Navbar() {
         <div className="hidden items-center gap-3 md:flex">
           <Link
             to="/login"
-            className="rounded-xl px-4 py-2 text-sm font-medium text-slate-300 transition-colors hover:text-white"
+            className="rounded-lg px-4 py-2 text-sm font-medium text-slate-300 hover:text-white"
           >
             Log in
           </Link>
           <Link
             to="/register"
-            className="rounded-xl bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-violet-500/30 transition-all hover:shadow-violet-500/50 hover:brightness-110"
+            className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-500"
           >
             Get Started
           </Link>
@@ -69,7 +62,7 @@ export default function Navbar() {
 
         <button
           onClick={() => setOpen((o) => !o)}
-          className="grid h-10 w-10 place-items-center rounded-xl text-white md:hidden"
+          className="grid h-10 w-10 place-items-center rounded-lg text-white md:hidden"
           aria-label="Toggle menu"
         >
           <div className="flex w-5 flex-col gap-1.5">
@@ -88,44 +81,36 @@ export default function Navbar() {
         </button>
       </nav>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="overflow-hidden border-t border-white/10 bg-slate-950/95 backdrop-blur-xl md:hidden"
-          >
-            <div className="flex flex-col gap-4 px-6 py-6">
-              {links.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setOpen(false)}
-                  className="text-sm font-medium text-slate-300"
-                >
-                  {link.label}
-                </a>
-              ))}
-              <div className="mt-2 flex flex-col gap-2">
-                <Link
-                  to="/login"
-                  className="rounded-xl border border-white/15 px-4 py-2.5 text-center text-sm font-medium text-white"
-                >
-                  Log in
-                </Link>
-                <Link
-                  to="/register"
-                  className="rounded-xl bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 px-4 py-2.5 text-center text-sm font-semibold text-white"
-                >
-                  Get Started
-                </Link>
-              </div>
+      {open && (
+        <div className="border-t border-white/10 bg-slate-950 md:hidden">
+          <div className="flex flex-col gap-4 px-6 py-6">
+            {links.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={() => setOpen(false)}
+                className="text-sm font-medium text-slate-300"
+              >
+                {link.label}
+              </a>
+            ))}
+            <div className="mt-2 flex flex-col gap-2">
+              <Link
+                to="/login"
+                className="rounded-lg border border-white/15 px-4 py-2.5 text-center text-sm font-medium text-white"
+              >
+                Log in
+              </Link>
+              <Link
+                to="/register"
+                className="rounded-lg bg-violet-600 px-4 py-2.5 text-center text-sm font-semibold text-white"
+              >
+                Get Started
+              </Link>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.header>
+          </div>
+        </div>
+      )}
+    </header>
   )
 }

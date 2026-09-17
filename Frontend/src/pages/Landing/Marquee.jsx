@@ -15,15 +15,15 @@ export default function Marquee() {
   const row = [...words, ...words]
 
   return (
-    <section className="relative overflow-hidden border-y border-white/10 bg-gradient-to-r from-indigo-600 via-fuchsia-600 via-40% to-amber-500 py-4 shadow-lg shadow-fuchsia-900/40">
+    <section className="relative overflow-hidden border-y border-white/10 bg-white/[0.02] py-4">
       <div className="flex w-max gap-10 animate-marquee">
         {row.map((word, i) => (
           <span
             key={i}
-            className="flex items-center gap-10 text-sm font-extrabold tracking-widest text-white whitespace-nowrap uppercase"
+            className="flex items-center gap-10 text-sm font-semibold tracking-widest text-slate-400 whitespace-nowrap uppercase"
           >
             {word}
-            <span className="animate-pulse-soft text-amber-300">✦</span>
+            <span className="text-violet-400/50">/</span>
           </span>
         ))}
       </div>
