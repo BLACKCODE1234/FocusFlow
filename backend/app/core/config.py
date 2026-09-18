@@ -12,8 +12,8 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "FocusFlow API"
     API_V1_STR: str = "/api/v1"
 
-    #Access token remains valid for 8 days
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 11520  
+    #Access token remains valid for 15 minutes 
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15  
     SECRET_KEY: str
     
     #Values required to form the Database URL
