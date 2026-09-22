@@ -60,7 +60,7 @@ export default function Navbar() {
             Log in
           </Link>
           <Link
-            to="/register"
+            to="/signup"
             className="rounded-xl bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-violet-500/30 transition-all hover:shadow-violet-500/50 hover:brightness-110"
           >
             Get Started
@@ -116,7 +116,7 @@ export default function Navbar() {
                   Log in
                 </Link>
                 <Link
-                  to="/register"
+                  to="/signup"
                   className="rounded-xl bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 px-4 py-2.5 text-center text-sm font-semibold text-white"
                 >
                   Get Started
