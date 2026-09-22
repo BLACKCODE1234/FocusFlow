@@ -1,5 +1,7 @@
-import sys,os
-sys.path.insert(0 ,os.path.join(os.path.dirname(__file__),".."))
+import sys, os
+
+# Make the project root importable so Alembic can discover the app package.
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from logging.config import fileConfig
 
@@ -11,26 +13,19 @@ from app.core.config import settings
 from app.database.session import Base
 from app.models import users
 
-# this is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
+# This is the Alembic Config object, which exposes the active migration configuration.
 config = context.config
-config.set_main_option("sqlalchemy.url",settings.DATABASE_URL)
+config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 
-# Interpret the config file for Python logging.
-# This line sets up loggers basically.
+# Configure Python logging from the Alembic config file if available.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# add your model's MetaData object here
-# for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
+# Add the app's metadata object here so Alembic can detect model changes during autogenerate.
 target_metadata = Base.metadata
 
-# other values from the config, defined by the needs of env.py,
-# can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
-# ... etc.
+# Other values from the config, defined by the needs of env.py, can be acquired here.
+# For example: my_important_option = config.get_main_option("my_important_option")
 
 
 def run_migrations_offline() -> None:
