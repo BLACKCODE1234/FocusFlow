@@ -1,9 +1,12 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { apiPost, setToken } from '@/lib/api'
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false)
+  const [apiError, setApiError] = useState(null)
+  const navigate = useNavigate()
 
   const {
     register,
@@ -11,8 +14,19 @@ export default function Login() {
     formState: { errors, isSubmitting },
   } = useForm()
 
-  const onSubmit = (data) => {
-    console.log(data)
+  const onSubmit = async (data) => {
+    setApiError(null)
+    try {
+      const res = await apiPost('/auth/login', {
+        email: data.email,
+        password: data.password,
+      })
+      if (res?.token) setToken(res.token)
+      else if (res?.access_token) setToken(res.access_token)
+      navigate('/')
+    } catch (err) {
+      setApiError(err.message || 'Login failed')
+    }
   }
 
   return (
@@ -86,6 +100,12 @@ export default function Login() {
               <p className="mt-1 text-xs text-rose-400">{errors.password.message}</p>
             )}
           </div>
+
+          {apiError && (
+            <p className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-400">
+              {apiError}
+            </p>
+          )}
 
           <div className="flex items-center justify-between">
             <label className="flex items-center gap-2">

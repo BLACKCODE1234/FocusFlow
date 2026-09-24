@@ -1,10 +1,13 @@
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { apiPost, setToken } from '@/lib/api'
 
 const LENGTH = 6
 
 export default function VerifyOtp() {
   const [otp, setOtp] = useState(Array(LENGTH).fill(''))
+  const [apiError, setApiError] = useState(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const inputs = useRef([])
   const navigate = useNavigate()
 
@@ -36,10 +39,23 @@ export default function VerifyOtp() {
     inputs.current[Math.min(pasted.length, LENGTH - 1)]?.focus()
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     const code = otp.join('')
-    console.log('OTP:', code)
+    const email = sessionStorage.getItem('pendingOtpEmail') || ''
+    setApiError(null)
+    setIsSubmitting(true)
+    try {
+      const res = await apiPost('/auth/verify-otp', { email, code })
+      if (res?.token) setToken(res.token)
+      else if (res?.access_token) setToken(res.access_token)
+      sessionStorage.removeItem('pendingOtpEmail')
+      navigate('/')
+    } catch (err) {
+      setApiError(err.message || 'Verification failed')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -75,12 +91,18 @@ export default function VerifyOtp() {
             ))}
           </div>
 
+          {apiError && (
+            <p className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-400">
+              {apiError}
+            </p>
+          )}
+
           <button
             type="submit"
             className="w-full rounded-xl bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/30 transition-all hover:shadow-violet-500/50 hover:brightness-110 disabled:opacity-50"
-            disabled={otp.some((d) => !d)}
+            disabled={otp.some((d) => !d) || isSubmitting}
           >
-            Verify
+            {isSubmitting ? 'Verifying...' : 'Verify'}
           </button>
         </form>
 

@@ -1,9 +1,12 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { apiPost } from '@/lib/api'
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false)
+  const [apiError, setApiError] = useState(null)
+  const navigate = useNavigate()
 
   const {
     register,
@@ -11,8 +14,20 @@ export default function Register() {
     formState: { errors, isSubmitting },
   } = useForm()
 
-  const onSubmit = (data) => {
-    console.log(data)
+  const onSubmit = async (data) => {
+    setApiError(null)
+    try {
+      await apiPost('/auth/register', {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        password: data.password,
+      })
+      sessionStorage.setItem('pendingOtpEmail', data.email)
+      navigate('/verify-otp')
+    } catch (err) {
+      setApiError(err.message || 'Registration failed')
+    }
   }
 
   return (
@@ -138,6 +153,12 @@ export default function Register() {
               <p className="mt-1 text-xs text-rose-400">{errors.confirmPassword.message}</p>
             )}
           </div>
+
+          {apiError && (
+            <p className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-400">
+              {apiError}
+            </p>
+          )}
 
           <button
             type="submit"
