@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
-import { apiPost, setToken } from '@/lib/api'
+import { apiPost } from '@/lib/api'
 
-export default function Login() {
-  const [showPassword, setShowPassword] = useState(false)
+export default function ForgotPassword() {
   const [apiError, setApiError] = useState(null)
   const navigate = useNavigate()
 
@@ -17,15 +16,12 @@ export default function Login() {
   const onSubmit = async (data) => {
     setApiError(null)
     try {
-      const res = await apiPost('/auth/login', {
-        email: data.email,
-        password: data.password,
-      })
-      if (res?.token) setToken(res.token)
-      else if (res?.access_token) setToken(res.access_token)
-      navigate('/')
+      await apiPost('/auth/forgot-password', { email: data.email })
+      sessionStorage.setItem('pendingOtpEmail', data.email)
+      sessionStorage.setItem('otpFlow', 'reset-password')
+      navigate('/verify-otp')
     } catch (err) {
-      setApiError(err.message || 'Login failed')
+      setApiError(err.message || 'Could not send reset code')
     }
   }
 
@@ -47,8 +43,10 @@ export default function Login() {
               FocusFlow<span className="gradient-text font-extrabold"> AI</span>
             </span>
           </Link>
-          <h1 className="text-2xl font-bold text-white">Welcome back</h1>
-          <p className="mt-2 text-sm text-slate-400">Log in to your account</p>
+          <h1 className="text-2xl font-bold text-white">Forgot password?</h1>
+          <p className="mt-2 text-sm text-slate-400">
+            Enter your email and we&apos;ll send you a reset code
+          </p>
         </div>
 
         <form
@@ -74,62 +72,25 @@ export default function Login() {
             )}
           </div>
 
-          <div>
-            <label htmlFor="password" className="mb-1.5 block text-xs font-medium text-slate-300">
-              Password
-            </label>
-            <div className="relative">
-              <input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="••••••••"
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 pr-10 text-sm text-white placeholder-slate-500 outline-none transition-colors focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20"
-                {...register('password', {
-                  required: 'Password is required',
-                })}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((s) => !s)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-white"
-              >
-                {showPassword ? 'Hide' : 'Show'}
-              </button>
-            </div>
-            {errors.password && (
-              <p className="mt-1 text-xs text-rose-400">{errors.password.message}</p>
-            )}
-          </div>
-
           {apiError && (
             <p className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-400">
               {apiError}
             </p>
           )}
 
-          <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2">
-              <input type="checkbox" className="h-4 w-4 rounded border-white/10 bg-white/5 text-violet-500 focus:ring-violet-500/20" />
-              <span className="text-xs text-slate-400">Remember me</span>
-            </label>
-            <Link to="/forgot-password" className="text-xs font-medium text-violet-400 hover:text-violet-300">
-              Forgot password?
-            </Link>
-          </div>
-
           <button
             type="submit"
             disabled={isSubmitting}
             className="w-full rounded-xl bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/30 transition-all hover:shadow-violet-500/50 hover:brightness-110 disabled:opacity-50"
           >
-            {isSubmitting ? 'Logging in...' : 'Log in'}
+            {isSubmitting ? 'Sending code...' : 'Send reset code'}
           </button>
         </form>
 
         <p className="mt-6 text-center text-sm text-slate-400">
-          Don&apos;t have an account?{' '}
-          <Link to="/signup" className="font-medium text-violet-400 hover:text-violet-300">
-            Sign up
+          Remember your password?{' '}
+          <Link to="/login" className="font-medium text-violet-400 hover:text-violet-300">
+            Log in
           </Link>
         </p>
       </div>

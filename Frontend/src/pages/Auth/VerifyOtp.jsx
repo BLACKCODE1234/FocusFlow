@@ -43,9 +43,15 @@ export default function VerifyOtp() {
     e.preventDefault()
     const code = otp.join('')
     const email = sessionStorage.getItem('pendingOtpEmail') || ''
+    const flow = sessionStorage.getItem('otpFlow')
     setApiError(null)
     setIsSubmitting(true)
     try {
+      if (flow === 'reset-password') {
+        sessionStorage.setItem('otpCode', code)
+        navigate('/reset-password')
+        return
+      }
       const res = await apiPost('/auth/verify-otp', { email, code })
       if (res?.token) setToken(res.token)
       else if (res?.access_token) setToken(res.access_token)

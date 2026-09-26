@@ -5,6 +5,8 @@ const Landing = lazy(() => import('./pages/Landing/Landing.jsx'))
 const Register = lazy(() => import('./pages/Auth/Register.jsx'))
 const Login = lazy(() => import('./pages/Auth/Login.jsx'))
 const VerifyOtp = lazy(() => import('./pages/Auth/VerifyOtp.jsx'))
+const ForgotPassword = lazy(() => import('./pages/Auth/ForgotPassword.jsx'))
+const ResetPassword = lazy(() => import('./pages/Auth/ResetPassword.jsx'))
 
 function PageLoader() {
   return (
@@ -22,6 +24,8 @@ export default function App() {
         <Route path="/signup" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/verify-otp" element={<VerifyOtp />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
     </Suspense>
   )
