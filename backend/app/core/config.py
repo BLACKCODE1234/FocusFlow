@@ -13,8 +13,10 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
 
     #Access token remains valid for 15 minutes 
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15  
-    SECRET_KEY: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
+    SECRET_KEY: str 
+    ALGORITHM: str = "HS256"
+    CORS_ORIGINS: str = "http://localhost:3000"
     
     #Values required to form the Database URL
     DB_USER: str = Field(default="root", validation_alias=AliasChoices("DB_USER", "USER"))
