@@ -1,4 +1,5 @@
 from typing import Optional
+import unicodedata
 
 from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 
@@ -14,11 +15,32 @@ class UserCreate(BaseModel):
     confirm_password: str = Field(min_length=8, max_length=100) 
     timezone: str = "UTC"
 
-    # Remove accidental edge whitespace without restricting valid name characters.
+    # Allow Unicode letters, combining marks, spaces, and common name punctuation.
     @field_validator("first_name", "last_name", mode="before")
     @classmethod
-    def strip_name_whitespace(cls, value: str) -> str:
-        return value.strip() if isinstance(value, str) else value
+    def validate_name_characters(cls, value: str) -> str:
+        if not isinstance(value, str):
+            return value
+
+        value = value.strip()
+        has_letter = False
+        allowed_punctuation = " '-.\u2019\u2010\u2011\u2012\u2013\u2014"
+
+        for character in value:
+            category = unicodedata.category(character)
+            if category.startswith("L"):
+                has_letter = True
+            elif category.startswith("M") or character in allowed_punctuation:
+                continue
+            else:
+                raise ValueError(
+                    "Names may contain letters, spaces, apostrophes, hyphens, and periods only"
+                )
+
+        if not has_letter:
+            raise ValueError("Names must contain at least one letter")
+
+        return value
 
     @model_validator(mode="after")
     def passwords_match(self):

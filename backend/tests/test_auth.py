@@ -27,21 +27,21 @@ def test_user_timezone_defaults_to_utc():
 
 def test_user_names_are_trimmed_and_allow_unicode_and_punctuation():
     user = UserCreate(
-        first_name="  Zoë ",
+        first_name="  Zoë 李 ",
         last_name=" O'Connor-Smith ",
         email="alice@example.com",
         password="secret123",
         confirm_password="secret123",
     )
 
-    assert user.first_name == "Zoë"
+    assert user.first_name == "Zoë 李"
     assert user.last_name == "O'Connor-Smith"
 
 
-# Check both name fields reject whitespace-only and overlong values.
+# Check both name fields reject blanks, overlong values, digits, and emoji.
 @pytest.mark.parametrize("field", ["first_name", "last_name"])
-@pytest.mark.parametrize("invalid_name", ["   ", "x" * 101])
-def test_user_names_reject_blank_or_overlong_values(field, invalid_name):
+@pytest.mark.parametrize("invalid_name", ["   ", "x" * 101, "Name2", "🙂Name"])
+def test_user_names_reject_invalid_values(field, invalid_name):
     values = {
         "first_name": "Alice",
         "last_name": "Example",
