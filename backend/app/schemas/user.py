@@ -1,17 +1,24 @@
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, model_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 
 
 # This schema defines what a frontend must send when creating a new account.
 # It validates the request body before the user is saved to the database.
 class UserCreate(BaseModel):
-    first_name: str
-    last_name: str
+    # Keep required names within the 100-character database column limit.
+    first_name: str = Field(min_length=1, max_length=100)
+    last_name: str = Field(min_length=1, max_length=100)
     email: EmailStr
-    password: str
-    confirm_password: str
-    timezone: Optional[str] = None  # Frontend may include this silently without a separate form field.
+    password: str = Field(min_length=8, max_length=100)
+    confirm_password: str = Field(min_length=8, max_length=100) 
+    timezone: str = "UTC"
+
+    # Remove accidental edge whitespace without restricting valid name characters.
+    @field_validator("first_name", "last_name", mode="before")
+    @classmethod
+    def strip_name_whitespace(cls, value: str) -> str:
+        return value.strip() if isinstance(value, str) else value
 
     @model_validator(mode="after")
     def passwords_match(self):
@@ -19,6 +26,7 @@ class UserCreate(BaseModel):
         if self.password != self.confirm_password:
             raise ValueError("Passwords do not match")
         return self
+    
 
 
 # This schema defines the expected request body for the login endpoint.

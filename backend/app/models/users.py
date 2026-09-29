@@ -24,7 +24,7 @@ class User(Base):
     hashed_password = Column(String(255), nullable=False)
 
     # Local timezone preference for the user.
-    timezone = Column(String(50), nullable=True)
+    timezone = Column(String(50), server_default="UTC", nullable=True)
 
     # Tracks whether the user has completed verification.
     is_verified = Column(Boolean, default=False, nullable=False)

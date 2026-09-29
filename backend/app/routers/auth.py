@@ -26,7 +26,7 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
         hashed_password=hash_password(user_in.password),
         first_name=user_in.first_name,
         last_name=user_in.last_name,
-        timezone=user_in.timezone,
+        timezone=user_in.timezone or "UTC",
     )
 
     # Save the new user to the database.
