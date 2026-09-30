@@ -26,9 +26,11 @@ class User(Base):
     # Local timezone preference for the user.
     timezone = Column(String(50), server_default="UTC", nullable=True)
 
-    # Tracks whether the user has completed verification.
+    # Tracks whether the user's email address has been verified with an OTP.
     is_verified = Column(Boolean, default=False, nullable=False)
 
     # Audit timestamps used to track account creation and updates.
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    otp_code = Column(String(255), nullable=True)          # stored hashed, same as password
+    otp_expires_at = Column(DateTime(timezone=True), nullable=True)

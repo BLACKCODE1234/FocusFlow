@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.database.session import get_db
 from app.models.users import User
-
+import secrets
 # FastAPI will read the JWT from the Authorization header in the format:
 # Authorization: Bearer <token>
 # This tells the app where to look for the access token during protected requests.
@@ -41,6 +41,11 @@ def authenticate_user(db: Session, email: str, password: str) -> Optional[User]:
     if not user or not verify_password(password, user.hashed_password):
         return None
     return user
+
+#This is used to generate 6 random string of numbers
+#To verify the user's email address, hence the user 
+def generate_otp(length: int = 6) -> str:
+    return "".join(secrets.choice("0123456789") for _ in range(length))
 
 
 # Generate a signed JWT for an authenticated user.

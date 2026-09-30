@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database.session import Base, engine
 from app.models import users  # noqa: F401 - ensures the User model is registered with SQLAlchemy
 from app.routers.auth import router as auth_router
+from app.routers.verification import router as verification_router
 
 # Create database tables if they do not exist yet.
 # For this project, Alembic is also configured, so this is mainly useful for local development.
@@ -25,6 +26,7 @@ app.add_middleware(
 )
 
 app.include_router(auth_router, prefix="/api/v1")
+app.include_router(verification_router, prefix="/api/v1")
 
 
 @app.get("/")

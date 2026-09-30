@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.core.security import authenticate_user, create_access_token, get_current_user, hash_password
+from datetime import datetime,timedelta,timezone
+from app.core.security import authenticate_user, create_access_token, get_current_user, hash_password,generate_otp
+from app.core.email import send_verification_email
 from app.database.session import get_db
 from app.models.users import User
 from app.schemas.user import Token, UserCreate, UserLogin, UserOut
@@ -20,6 +22,8 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
 
+    otp =generate_otp()
+
     # Build a new User model instance from the validated request payload.
     new_user = User(
         email=user_in.email,
@@ -27,6 +31,8 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
         first_name=user_in.first_name,
         last_name=user_in.last_name,
         timezone=user_in.timezone or "UTC",
+        otp_code=hash_password(otp),
+        otp_expires_at=datetime.now(timezone.utc) + timedelta(minutes=10),
     )
 
     # Save the new user to the database.
@@ -34,6 +40,7 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
+    send_verification_email(new_user.email,otp)
     # Return the newly created user to the client.
     return new_user
 

@@ -12,7 +12,9 @@ class UserCreate(BaseModel):
     last_name: str = Field(min_length=1, max_length=100)
     email: EmailStr
     password: str = Field(min_length=8, max_length=100)
+    # Used to catch password-entry mistakes during registration; checked below.
     confirm_password: str = Field(min_length=8, max_length=100) 
+    # User's preferred timezone; default to UTC when none is provided.
     timezone: str = "UTC"
 
     # Allow Unicode letters, combining marks, spaces, and common name punctuation.
@@ -70,6 +72,13 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     email: Optional[str] = None
 
+# Request body for verifying an account's email address with its emailed OTP.
+class VerifyEmailRequest(BaseModel):
+    # Identifies the account whose email address is being verified.
+    email: EmailStr
+    # Keep the OTP as text so codes with leading zeroes remain intact.
+    otp: str
+
 
 # This schema defines how user data is returned to the client after registration or profile fetch.
 # It hides sensitive fields like the password hash and exposes only safe public info.
@@ -78,6 +87,7 @@ class UserOut(BaseModel):
     first_name: str
     last_name: str
     email: EmailStr
+    # Indicates whether the account's email verification has been completed.
     is_verified: bool
 
     class Config:
