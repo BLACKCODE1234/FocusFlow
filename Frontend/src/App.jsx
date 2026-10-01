@@ -7,11 +7,12 @@ const Login = lazy(() => import('./pages/Auth/Login.jsx'))
 const VerifyOtp = lazy(() => import('./pages/Auth/VerifyOtp.jsx'))
 const ForgotPassword = lazy(() => import('./pages/Auth/ForgotPassword.jsx'))
 const ResetPassword = lazy(() => import('./pages/Auth/ResetPassword.jsx'))
+const NotFound = lazy(() => import('./pages/NotFound.jsx'))
 
 function PageLoader() {
   return (
-    <div className="grid min-h-screen place-items-center bg-slate-950">
-      <span className="h-10 w-10 animate-spin rounded-full border-2 border-slate-700 border-t-fuchsia-500" />
+    <div className="grid min-h-screen place-items-center bg-canvas">
+      <span className="h-9 w-9 animate-spin rounded-full border-2 border-line border-t-amber" />
     </div>
   )
 }
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="/verify-otp" element={<VerifyOtp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
   )

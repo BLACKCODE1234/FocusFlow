@@ -2,9 +2,36 @@
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-grotesk: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* FocusFlow landing palette */
+  --color-canvas: #0b0e14;
+  --color-surface: #12161f;
+  --color-deck: #181d29;
+  --color-ink: #f3f1ea;
+  --color-dim: #8991a3;
+  --color-line: #262c3c;
+  --color-amber: #f2b84b;
+  --color-cyan: #5fd3c4;
+  --color-coral: #ff7a68;
+
+  --animate-typing: typing 1.2s ease-in-out infinite;
+
+  @keyframes typing {
+    0%,
+    60%,
+    100% {
+      transform: translateY(0);
+      opacity: 0.5;
+    }
+    30% {
+      transform: translateY(-4px);
+      opacity: 1;
+    }
+  }
 
   --animate-float: float 6s ease-in-out infinite;
-  --animate-float-slow: float 9s ease-in-out infinite;
   --animate-float-slower: float 12s ease-in-out infinite;
   --animate-blob: blob 14s ease-in-out infinite;
   --animate-gradient-x: gradient-x 6s ease infinite;
@@ -12,7 +39,6 @@
   --animate-spin-slower: spin-slower 10s linear infinite;
   --animate-spin-reverse: spin-reverse 14s linear infinite;
   --animate-marquee: marquee 30s linear infinite;
-  --animate-shine: shine 3s ease-in-out infinite;
   --animate-twinkle: twinkle 4s ease-in-out infinite;
   --animate-bounce-soft: bounce-soft 2s ease-in-out infinite;
 
@@ -85,17 +111,6 @@
     }
   }
 
-  @keyframes shine {
-    0%,
-    100% {
-      transform: translateX(-150%) skewX(-20deg);
-    }
-    60%,
-    100% {
-      transform: translateX(250%) skewX(-20deg);
-    }
-  }
-
   @keyframes twinkle {
     0%,
     100% {
@@ -122,6 +137,7 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
   }
 
   body {
@@ -134,6 +150,29 @@
   ::selection {
     background-color: var(--color-fuchsia-500);
     color: var(--color-white);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-amber);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center rounded-[3px] border border-transparent px-[22px] py-3 text-[0.92rem] font-semibold no-underline transition duration-150;
+  }
+
+  .btn-primary {
+    @apply bg-amber text-[#171205] hover:-translate-y-px;
+  }
+
+  .btn-ghost {
+    @apply border-line text-ink hover:border-dim;
+  }
+
+  .btn-sm {
+    @apply px-4 py-2.5 text-[0.88rem];
   }
 }
 
@@ -179,4 +218,18 @@
   text-shadow:
     0 0 20px rgb(192 132 252 / 0.55),
     0 0 60px rgb(244 114 182 / 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
