@@ -80,6 +80,10 @@ class VerifyEmailRequest(BaseModel):
     otp: str
 
 
+class ResendOtpRequest(BaseModel):
+    email: EmailStr
+
+
 # This schema defines how user data is returned to the client after registration or profile fetch.
 # It hides sensitive fields like the password hash and exposes only safe public info.
 class UserOut(BaseModel):
