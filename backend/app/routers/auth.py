@@ -6,6 +6,7 @@ from app.core.security import authenticate_user, create_access_token, get_curren
 from app.core.email import send_verification_email
 from app.database.session import get_db
 from app.models.users import User
+from app.models.pending_users import PendingUser
 from app.schemas.user import Token, UserCreate, UserLogin, UserOut
 
 # Router for authentication and account-related endpoints.
@@ -14,35 +15,42 @@ router = APIRouter()
 
 # Register a new user account.
 # This route validates that the email is not already in use, hashes the password,
-# and saves the user to the database before returning the created record.
-@router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
+# and saves a pending registration before sending the verification code.
+@router.post("/register", status_code=status.HTTP_201_CREATED)
 def register(user_in: UserCreate, db: Session = Depends(get_db)):
-    # Check whether an account already exists with the same email.
-    existing = db.query(User).filter(User.email == user_in.email).first()
-    if existing:
+    # Prevent duplicate accounts across both active and pending registrations.
+    existing_user = db.query(User).filter(User.email == user_in.email).first()
+    existing_pending = db.query(PendingUser).filter(PendingUser.email == user_in.email).first()
+    if existing_user or existing_pending:
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    otp =generate_otp()
+    otp = generate_otp()
+    expires_at = datetime.now(timezone.utc) + timedelta(minutes=10)
 
-    # Build a new User model instance from the validated request payload.
-    new_user = User(
-        email=user_in.email,
-        hashed_password=hash_password(user_in.password),
-        first_name=user_in.first_name,
-        last_name=user_in.last_name,
-        timezone=user_in.timezone or "UTC",
-        otp_code=hash_password(otp),
-        otp_expires_at=datetime.now(timezone.utc) + timedelta(minutes=10),
-    )
+    pending = db.query(PendingUser).filter(PendingUser.email == user_in.email).first()
+    if pending:
+        pending.hashed_password = hash_password(user_in.password)
+        pending.first_name = user_in.first_name
+        pending.last_name = user_in.last_name
+        pending.timezone = user_in.timezone
+        pending.otp_code = hash_password(otp)
+        pending.otp_expires_at = expires_at
+    else:
+        pending = PendingUser(
+            email=user_in.email,
+            hashed_password=hash_password(user_in.password),
+            first_name=user_in.first_name,
+            last_name=user_in.last_name,
+            timezone=user_in.timezone,
+            otp_code=hash_password(otp),
+            otp_expires_at=expires_at,
+        )
 
-    # Save the new user to the database.
-    db.add(new_user)
+        db.add(pending)
+
     db.commit()
-    db.refresh(new_user)
-
-    send_verification_email(new_user.email,otp)
-    # Return the newly created user to the client.
-    return new_user
+    send_verification_email(user_in.email, otp)
+    return {"message": "Verification code sent to email"}
 
 
 @router.post("/login", response_model=Token)

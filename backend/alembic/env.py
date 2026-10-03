@@ -14,6 +14,7 @@ from app.database.session import Base
 from app.models import users
 from app.models import Categories
 from app.models import task
+from app.models import pending_users
 
 # This is the Alembic Config object, which exposes the active migration configuration.
 config = context.config

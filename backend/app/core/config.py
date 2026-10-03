@@ -24,7 +24,10 @@ class Settings(BaseSettings):
     DB_HOST: str = Field(default="localhost", validation_alias=AliasChoices("DB_HOST", "HOST"))
     DB_PORT: str = Field(default="3306", validation_alias=AliasChoices("DB_PORT", "PORT"))
     DB_NAME: str = Field(default="Focus_Flow_AI", validation_alias=AliasChoices("DB_NAME", "DB"))
-
+    SMTP_HOST:str
+    SMTP_PORT: int
+    SMTP_USERNAME: str
+    SMTP_PASSWORD: str
     #Database URL is formed by this function
     @property
     def DATABASE_URL(self) -> str:
