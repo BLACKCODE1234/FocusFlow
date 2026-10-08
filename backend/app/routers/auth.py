@@ -25,7 +25,7 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Email already registered")
 
     otp = generate_otp()
-    expires_at = datetime.now(timezone.utc) + timedelta(minutes=10)
+    expires_at = datetime.now(timezone.utc) + timedelta(minutes=3)
 
     pending = db.query(PendingUser).filter(PendingUser.email == user_in.email).first()
     if pending:

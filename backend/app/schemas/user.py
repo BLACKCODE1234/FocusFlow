@@ -42,7 +42,7 @@ class UserCreate(BaseModel):
         if not has_letter:
             raise ValueError("Names must contain at least one letter")
 
-        return value
+        return value[0].upper() + value[1:]
 
     @model_validator(mode="after")
     def passwords_match(self):

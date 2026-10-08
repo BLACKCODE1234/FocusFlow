@@ -29,7 +29,7 @@ def resend_otp(payload: ResendOtpRequest, db: Session = Depends(get_db)):
 
     otp = generate_otp()
     pending_user.otp_code = hash_password(otp)
-    pending_user.otp_expires_at = now + timedelta(minutes=10)
+    pending_user.otp_expires_at = now + timedelta(minutes=3)
     db.commit()
 
     send_verification_email(pending_user.email, otp)

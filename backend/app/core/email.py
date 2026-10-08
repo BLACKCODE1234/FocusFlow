@@ -11,7 +11,7 @@ def send_verification_email(to_email: str, otp: str):
     msg["From"] = settings.SMTP_USERNAME
     msg["To"] = to_email
     msg["Subject"] = "Your FocusFlow AI verification code"
-    msg.attach(MIMEText(f"Your verification code is: {otp}\nExpires in 10 minutes.", "plain"))
+    msg.attach(MIMEText(f"Your verification code is: {otp}\nExpires in 3 minutes.", "plain"))
 
     # Connect to the configured SMTP server and send the verification email.
     with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT) as server:

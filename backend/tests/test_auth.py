@@ -38,6 +38,19 @@ def test_user_names_are_trimmed_and_allow_unicode_and_punctuation():
     assert user.last_name == "O'Connor-Smith"
 
 
+def test_user_names_start_with_a_capital_letter():
+    user = UserCreate(
+        first_name="alice McDONALD",
+        last_name="o'Connor-Smith",
+        email="alice@example.com",
+        password="secret123",
+        confirm_password="secret123",
+    )
+
+    assert user.first_name == "Alice McDONALD"
+    assert user.last_name == "O'Connor-Smith"
+
+
 # Check both name fields reject blanks, overlong values, digits, and emoji.
 @pytest.mark.parametrize("field", ["first_name", "last_name"])
 @pytest.mark.parametrize("invalid_name", ["   ", "x" * 101, "Name2", "🙂Name"])
