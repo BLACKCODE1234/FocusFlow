@@ -11,18 +11,24 @@ from app.models.users import User
 from app.schemas.user import ResendOtpRequest, VerifyEmailRequest
 
 router = APIRouter()
-
+#Number of attempts
+MAX_OTP_ATTEMPTS = 3
+LOCK_OUT_MESSAGE = "Too many incorrect attempts, please re-enter email to get new OTP"
 
 @router.post("/resend-otp")
 def resend_otp(payload: ResendOtpRequest, db: Session = Depends(get_db)):
     pending_user = db.query(PendingUser).filter(PendingUser.email == payload.email).first()
     if not pending_user:
         raise HTTPException(status_code=404, detail="Pending registration not found")
-
     now = datetime.now(timezone.utc)
     otp_expires_at = pending_user.otp_expires_at
     if otp_expires_at is not None and otp_expires_at.tzinfo is None:
         otp_expires_at = otp_expires_at.replace(tzinfo=timezone.utc)
+
+    if otp_expires_at is not None:
+        sent_at = otp_expires_at - timedelta(minutes=3)
+        if now < sent_at + timedelta(seconds=60):
+            raise HTTPException(status_code=429, detail="Please wait a minute before requesting another code")
 
     if otp_expires_at is not None and otp_expires_at > now:
         raise HTTPException(status_code=400, detail="The current OTP has not expired yet")
@@ -30,6 +36,7 @@ def resend_otp(payload: ResendOtpRequest, db: Session = Depends(get_db)):
     otp = generate_otp()
     pending_user.otp_code = hash_password(otp)
     pending_user.otp_expires_at = now + timedelta(minutes=3)
+    pending_user.otp_attempts = 0
     db.commit()
 
     send_verification_email(pending_user.email, otp)
@@ -42,6 +49,9 @@ def verify_email(payload: VerifyEmailRequest, db: Session = Depends(get_db)):
     pending_user = db.query(PendingUser).filter(PendingUser.email == payload.email).first()
     if not pending_user:
         raise HTTPException(status_code=404, detail="Pending registration not found")
+    
+    if pending_user.otp_attempts >= MAX_OTP_ATTEMPTS:
+        raise HTTPException(status_code=429, detail =LOCK_OUT_MESSAGE)
 
     # MySQL DATETIME values are returned without timezone info; treat stored values as UTC.
     otp_expires_at = pending_user.otp_expires_at
@@ -54,7 +64,12 @@ def verify_email(payload: VerifyEmailRequest, db: Session = Depends(get_db)):
 
     # Compare the submitted code against the stored password-style hash.
     if not verify_password(payload.otp, pending_user.otp_code):
-        raise HTTPException(status_code=400, detail="Invalid OTP")
+        pending_user.otp_attempts += 1
+        db.commit()
+        if pending_user.otp_attempts >= MAX_OTP_ATTEMPTS:
+            raise HTTPException(status_code=429, detail=LOCK_OUT_MESSAGE)
+        remaining = MAX_OTP_ATTEMPTS - pending_user.otp_attempts
+        raise HTTPException(status_code=400, detail=f"Invalid OTP, {remaining} attempts left")
 
     # Promote the pending user to the verified account table.
     user = User(

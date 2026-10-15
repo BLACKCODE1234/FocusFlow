@@ -23,3 +23,4 @@ class PendingUser(Base):
     otp_expires_at = Column(DateTime(timezone=True), nullable=False)
     # Time when this pending registration was created.
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    otp_attempts = Column(Integer, nullable=False, default=0, server_default="0")
